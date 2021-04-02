@@ -4,6 +4,14 @@
 
 package require Tclx
 
+proc clean_nix_wrapper {shortName} {
+    if [regexp \.(.+)-wrapped $shortName -> shortName] {
+	tailcall clean_nix_wrapper $shortName
+    } else {
+	return $shortName
+    }
+}
+
 #
 # this is the code that gets called when Tcl launches because the
 # tcllauncher "version" of Tcl jimmies the command line to make it
@@ -22,7 +30,7 @@ proc main {{argv ""}} {
     }
 
     set path [file split $prog]
-    set shortName [lindex $path end]
+    set shortName [clean_nix_wrapper [lindex $path end]]
 
     #
     # tcllauncher cannot be invoked directly as "tcllauncher" -- it must be
